@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灰度 → 伪彩色 调试台 v3（全参数化）</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #16161a; color: #dcdce4; overflow: hidden;
+  }
+  #app {
+    display: grid; grid-template-columns: 480px minmax(0, 1fr);
+    gap: 12px; padding: 12px; height: 100vh;
+  }
+  #left {
+    display: flex; flex-direction: column; gap: 8px; min-height: 0;
+    background: #1e1e24; border: 1px solid #2c2c35;
+    border-radius: 10px; padding: 12px;
+  }
+  h3 {
+    margin: 0; font-size: 12px; color: #8a8a9a;
+    font-weight: 600; letter-spacing: .6px; text-transform: uppercase;
+  }
+  #code {
+    flex: 1; min-height: 220px; resize: none;
+    background: #0f0f13; color: #cfe4ff;
+    border: 1px solid #30303c; border-radius: 8px; padding: 10px;
+    font: inherit; line-height: 1.55; tab-size: 2;
+    white-space: pre; overflow: auto; outline: none;
+  }
+  #code:focus { border-color: #3d6fbf; }
+  select {
+    background: #0f0f13; color: #cfe4ff; border: 1px solid #30303c;
+    border-radius: 8px; padding: 6px 8px; font: inherit; outline: none;
+  }
+  #hint {
+    font-size: 11px; color: #7a7a8a; line-height: 1.5;
+    background: #14141a; border-left: 2px solid #3d6fbf;
+    padding: 6px 10px; border-radius: 0 6px 6px 0;
+  }
+  #hint b { color: #9ecbff; }
+  #msg { font-size: 12px; min-height: 18px; white-space: pre-wrap; word-break: break-word; }
+  #msg.ok  { color: #5fd18b; }
+  #msg.err { color: #ff7070; }
+  button {
+    background: #2d6adf; color: #fff; border: 0; border-radius: 8px;
+    padding: 8px 14px; font: inherit; font-size: 12px; cursor: pointer;
+  }
+  button:hover { background: #3b7cf5; }
+  button.ghost { background: #2c2c35; }
+  button.ghost:hover { background: #3a3a46; }
+  #right {
+    overflow-y: auto; display: flex; flex-direction: column;
+    gap: 12px; padding-right: 4px;
+  }
+  .panel {
+    background: #1e1e24; border: 1px solid #2c2c35;
+    border-radius: 10px; padding: 12px;
+  }
+  .panel h3 { margin-bottom: 10px; }
+  canvas {
+    display: block; width: 100%; height: auto;
+    image-rendering: pixelated; border-radius: 6px; background: #000;
+  }
+  #ticks {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: #6a6a7a; margin-top: 4px;
+  }
+  pre#lut {
+    margin: 0; max-height: 360px; overflow: auto; background: #0f0f13;
+    border-radius: 8px; padding: 10px; font-size: 11px;
+    line-height: 1.45; color: #9ecbff;
+  }
+  input[type=file] { font: inherit; font-size: 12px; color: #8a8a9a; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #33333e; border-radius: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="left">
+    <h3>伪彩色映射 (JavaScript)</h3>
+    <select id="preset"></select>
+    <div id="hint"></div>
+    <textarea id="code" wrap="off" spellcheck="false"></textarea>
+    <div id="msg"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="apply">应用 (Ctrl+Enter)</button>
+      <button id="exportAll">导出全部 6 方案</button>
+      <button id="exportBtn" class="ghost">单方案 LUT</button>
+      <button id="copyBtn" class="ghost">复制</button>
+    </div>
+  </div>
+
+  <div id="right">
+    <div class="panel">
+      <h3>色带 0 → 255（鼠标悬停看数值）</h3>
+      <canvas id="band"></canvas>
+      <div id="ticks"></div>
+    </div>
+
+    <div class="panel">
+      <h3>测试图 / 上传图片</h3>
+      <canvas id="img"></canvas>
+      <div style="margin-top:8px">
+        <input type="file" id="file" accept="image/*">
+      </div>
+    </div>
+
+    <div class="panel" id="lutPanel" style="display:none">
+      <h3>导出结果（可直接粘回 C 代码）</h3>
+      <pre id="lut"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ============================================================
+   6 个方案：每个 map 函数开头都有 "可调参数" 区块。
+   改那里的数字 → 右侧实时预览 → 满意后点"导出全部 6 方案"
+   ============================================================ */
+const PRESETS = {
+
+"灰度 (对照)": `function map(gray) {
+  // 灰度方案：作为参照基准，无参数可调
+  return [gray, gray, gray];
+}`,
+
+"铁红 / Hot Iron": `function map(gray) {
+  // ==== 可调参数 ====
+  const T1 = 85;    // 黑→红 的终点（原 85）
+  const T2 = 170;   // 红→黄 的终点（原 170）
+  // 约束：0 < T1 < T2 < 255
+  // T1 调大 → 黑色段更长；T2 调小 → 红色段更短
+
+  let R, G, B;
+  if (gray <= T1) {
+    R = Math.round(gray / T1 * 255);
+    G = 0;
+    B = 0;
+  } else if (gray <= T2) {
+    R = 255;
+    G = Math.round((gray - T1) / (T2 - T1) * 255);
+    B = 0;
+  } else {
+    R = 255;
+    G = 255;
+    B = Math.round((gray - T2) / (255 - T2) * 255);
+  }
+  return [R, G, B];
+}`,
+
+"Pseudo1 (abs)": `function map(gray) {
+  // ==== 可调参数 ====
+  const M    = 127;   // G 通道 V 形底部的位置（原 127）
+  const gain = 1.0;   // G 通道斜率（原 1.0，>1 更陡，<1 更平）
+  // M 调大 → 蓝色域变宽、绿色域后移
+  // gain 调小 → 绿色过渡更柔和
+
+  const R = Math.abs(0 - gray);
+  const G = Math.min(255, Math.abs(M - gray) * gain);
+  const B = Math.abs(255 - gray);
+  return [R, G, B];
+}`,
+
+"Pseudo2 (四段)": `function map(gray) {
+  // ==== 可调参数 ====
+  const T1 = 63;    // 纯蓝位置（原 63）——调大 → 黑/深蓝更宽
+  const T2 = 127;   // 纯绿位置（原 127）——调大 → 蓝→绿过渡更慢
+  const T3 = 191;   // 纯黄位置（原 191）——调小 → 绿→黄过渡更快，绿色更窄
+  // 约束：0 < T1 < T2 < T3 < 255
+
+  let R = 0, G = 0, B = 0;
+  if (gray <= T1) {
+    B = Math.round(gray / T1 * 255);
+  } else if (gray <= T2) {
+    G = Math.round((gray - T1) / (T2 - T1) * 255);
+    B = Math.round((T2 - gray) / (T2 - T1) * 255);
+  } else if (gray <= T3) {
+    R = Math.round((gray - T2) / (T3 - T2) * 255);
+    G = 255;
+  } else {
+    R = 255;
+    G = Math.round((255 - gray) / (255 - T3) * 255);
+  }
+  return [R, G, B];
+}`,
+
+"Jet": `function map(gray) {
+  // ==== 可调参数 ====
+  const slope   = 4;    // 曲线陡度（原 4，越大颜色过渡越急剧）
+  const phaseR  = 3;    // 红色通道相位（原 3，越小红色越早出现）
+  const phaseG  = 2;    // 绿色通道相位（原 2）
+  const phaseB  = 1;    // 蓝色通道相位（原 1，越大蓝色越晚消失）
+  // 建议 phaseR > phaseG > phaseB，保持蓝→青→绿→黄→红 的顺序
+
+  const t = gray / 255;
+  const f = (x) => Math.min(1, Math.max(0, 1.5 - Math.abs(slope * t - x)));
+  return [f(phaseR) * 255, f(phaseG) * 255, f(phaseB) * 255];
+}`,
+
+"彩虹 (HSV)": `function hsv2rgb(h, s, v) {
+  const c = v * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = v - c;
+  let r = 0, g = 0, b = 0;
+  if      (h < 60)  { r = c; g = x; }
+  else if (h < 120) { r = x; g = c; }
+  else if (h < 180) { g = c; b = x; }
+  else if (h < 240) { g = x; b = c; }
+  else if (h < 300) { r = x; b = c; }
+  else              { r = c; b = x; }
+  return [Math.round((r + m) * 255),
+          Math.round((g + m) * 255),
+          Math.round((b + m) * 255)];
+}
+
+function map(gray) {
+  // ==== 可调参数 ====
+  const H_start = 240;   // 起始色相（原 240 = 蓝）
+                         //   0=红 60=黄 120=绿 180=青 240=蓝 300=紫
+  const H_end   = 0;     // 结束色相（原 0 = 红）
+  const S       = 1.0;   // 饱和度 0~1（越小越灰）
+  const V       = 1.0;   // 明度   0~1（越小越暗）
+
+  const t = gray / 255;
+  const h = H_start + (H_end - H_start) * t;
+  return hsv2rgb(h, S, V);
+}`
+};
+
+/* 每个方案对应的一段"调参提示"，显示在编辑区上方 */
+const HINTS = {
+  "灰度 (对照)":       "无参数，作为参照基准。",
+  "铁红 / Hot Iron":   "<b>T1</b> 黑→红终点 &nbsp; <b>T2</b> 红→黄终点 &nbsp; 约束 0&lt;T1&lt;T2&lt;255",
+  "Pseudo1 (abs)":     "<b>M</b> G 通道 V 底位置 &nbsp; <b>gain</b> G 斜率 &nbsp; M 大→蓝宽、绿后移",
+  "Pseudo2 (四段)":    "<b>T1</b> 纯蓝位置 &nbsp; <b>T2</b> 纯绿位置 &nbsp; <b>T3</b> 纯黄位置 &nbsp; 约束 0&lt;T1&lt;T2&lt;T3&lt;255",
+  "Jet":               "<b>slope</b> 陡度 &nbsp; <b>phaseR/G/B</b> 三通道相位 &nbsp; 建议 R&gt;G&gt;B",
+  "彩虹 (HSV)":        "<b>H_start</b> 起始色相 &nbsp; <b>H_end</b> 结束色相 &nbsp; <b>S</b> 饱和 &nbsp; <b>V</b> 明度"
+};
+
+/* ============ 导出全部 6 方案时用的映射顺序 ============ */
+const SCHEME_ORDER = [
+  { enum: 'COLOR_SCHEME_GRAY',     preset: '灰度 (对照)' },
+  { enum: 'COLOR_SCHEME_METAL1',   preset: '铁红 / Hot Iron' },
+  { enum: 'COLOR_SCHEME_PSEUDO1',  preset: 'Pseudo1 (abs)' },
+  { enum: 'COLOR_SCHEME_PSEUDO2',  preset: 'Pseudo2 (四段)' },
+  { enum: 'COLOR_SCHEME_RAINBOW2', preset: 'Jet' },
+  { enum: 'COLOR_SCHEME_RAINBOW3', preset: '彩虹 (HSV)' },
+];
+
+/* ============ DOM ============ */
+const $ = id => document.getElementById(id);
+const codeEl  = $('code');
+const msgEl   = $('msg');
+const hintEl  = $('hint');
+const bandCv  = $('band'),  bandCtx = bandCv.getContext('2d');
+const imgCv   = $('img'),   imgCtx  = imgCv.getContext('2d');
+
+/* ============ 状态 ============ */
+let mapFn  = null;
+const lut  = new Uint8Array(256 * 3);
+let testGray = null, testW = 0, testH = 0;
+let lutVisible = false;
+
+/* ============ 工具 ============ */
+function setMsg(t, cls) { msgEl.textContent = t; msgEl.className = cls || ''; }
+const pad3 = n => String(n).padStart(3, ' ');
+const hex2 = n => n.toString(16).toUpperCase().padStart(2, '0');
+
+function clampByte(v) {
+  if (typeof v !== 'number' || !isFinite(v)) return 0;
+  v = Math.round(v);
+  return v < 0 ? 0 : v > 255 ? 255 : v;
+}
+
+/* ============ 编译并应用 ============ */
+function apply() {
+  const src = codeEl.value;
+  try {
+    const factory = new Function(
+      '"use strict";\n' + src +
+      '\n;return (typeof map === "function") ? map : null;'
+    );
+    const fn = factory();
+    if (typeof fn !== 'function')
+      throw new Error('必须定义 function map(gray) { ... }');
+
+    for (const v of [0, 1, 63, 64, 127, 128, 191, 192, 254, 255]) {
+      let o;
+      try { o = fn(v); }
+      catch (e) { throw new Error('map(' + v + ') 执行出错: ' + e.message); }
+      if (!o || typeof o.length !== 'number' || o.length < 3)
+        throw new Error('map(gray) 必须返回 [R, G, B]，当前返回: ' + JSON.stringify(o));
+    }
+    mapFn = fn;
+    setMsg('✓ 已应用', 'ok');
+  } catch (e) {
+    setMsg('✗ ' + e.message, 'err');
+    return;
+  }
+
+  buildLUT();
+  renderBand();
+  renderTest();
+  if (lutVisible) renderLUT();
+}
+
+function buildLUT() {
+  for (let i = 0; i < 256; i++) {
+    let o;
+    try { o = mapFn(i); } catch (e) { o = [0, 0, 0]; }
+    lut[i * 3]     = clampByte(o && o[0]);
+    lut[i * 3 + 1] = clampByte(o && o[1]);
+    lut[i * 3 + 2] = clampByte(o && o[2]);
+  }
+}
+
+/* ============ 渲染色带 ============ */
+function renderBand() {
+  const W = 256, H = 64;
+  bandCv.width = W; bandCv.height = H;
+  const img = bandCtx.createImageData(W, H);
+  for (let x = 0; x < W; x++) {
+    const r = lut[x * 3], g = lut[x * 3 + 1], b = lut[x * 3 + 2];
+    for (let y = 0; y < H; y++) {
+      const i = (y * W + x) * 4;
+      img.data[i] = r; img.data[i + 1] = g; img.data[i + 2] = b; img.data[i + 3] = 255;
+    }
+  }
+  bandCtx.putImageData(img, 0, 0);
+}
+
+/* ============ 渲染测试图 ============ */
+function renderTest() {
+  if (!testGray) return;
+  imgCv.width = testW; imgCv.height = testH;
+  const img = imgCtx.createImageData(testW, testH);
+  const d = img.data;
+  for (let i = 0, n = testW * testH; i < n; i++) {
+    const v = testGray[i];
+    d[i * 4]     = lut[v * 3];
+    d[i * 4 + 1] = lut[v * 3 + 1];
+    d[i * 4 + 2] = lut[v * 3 + 2];
+    d[i * 4 + 3] = 255;
+  }
+  imgCtx.putImageData(img, 0, 0);
+}
+
+function makeDefaultTest() {
+  testW = 256; testH = 256;
+  testGray = new Uint8ClampedArray(testW * testH);
+  for (let y = 0; y < testH; y++) {
+    for (let x = 0; x < testW; x++) {
+      let v;
+      if (y < 128) {
+        v = x;
+      } else {
+        const dx = x - 128, dy = y - 128;
+        const d = Math.sqrt(dx * dx + dy * dy) / 181;
+        const radial = 255 * (1 - Math.min(1, d));
+        v = 0.5 * x + 0.5 * radial;
+      }
+      testGray[y * testW + x] = v | 0;
+    }
+  }
+}
+
+/* ============ 单方案 LUT 导出 ============ */
+function renderLUT() {
+  const lines = [];
+  lines.push('/* 自动生成：灰度 → RGB 查找表（当前编辑区方案） */');
+  lines.push('static const uint8_t pseudoLUT[256][3] = {');
+  for (let i = 0; i < 256; i++) {
+    const r = lut[i * 3], g = lut[i * 3 + 1], b = lut[i * 3 + 2];
+    lines.push('    {' + pad3(r) + ', ' + pad3(g) + ', ' + pad3(b) + '},  // ' + pad3(i));
+  }
+  lines.push('};');
+  $('lut').textContent = lines.join('\n');
+}
+
+/* ============ 一键导出全部 6 方案（RGB565） ============ */
+function compilePreset(key) {
+  const factory = new Function(
+    '"use strict";\n' + PRESETS[key] +
+    '\n;return (typeof map === "function") ? map : null;'
+  );
+  const fn = factory();
+  if (typeof fn !== 'function') throw new Error(key + ' 编译失败');
+  return fn;
+}
+
+function toRGB565Swapped(r, g, b) {
+  const c = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+  return ((c >> 8) | (c << 8)) & 0xFFFF;
+}
+
+function exportAllSchemes() {
+  const out = [];
+  out.push('/* 自动生成：灰度 → RGB565 伪彩色 LUT（字节已交换） */');
+  out.push('/* 直接替换 g_color_luts 定义，无需任何初始化函数 */');
+  out.push('static const uint16_t g_color_luts[COLOR_SCHEME_COUNT][256] = {');
+
+  SCHEME_ORDER.forEach((item, idx) => {
+    const fn = compilePreset(item.preset);
+    const vals = [];
+    for (let g = 0; g < 256; g++) {
+      const o = fn(g);
+      const r  = Math.max(0, Math.min(255, Math.round(o[0])));
+      const gg = Math.max(0, Math.min(255, Math.round(o[1])));
+      const b  = Math.max(0, Math.min(255, Math.round(o[2])));
+      vals.push(toRGB565Swapped(r, gg, b));
+    }
+    out.push('    /* [' + idx + '] ' + item.enum + ' */');
+    out.push('    {');
+    for (let i = 0; i < 256; i += 8) {
+      const row = vals.slice(i, i + 8)
+        .map(v => '0x' + v.toString(16).toUpperCase().padStart(4, '0'))
+        .join(', ');
+      out.push('        ' + row + (i + 8 < 256 ? ',' : ''));
+    }
+    out.push('    }' + (idx < SCHEME_ORDER.length - 1 ? ',' : ''));
+    out.push('');
+  });
+
+  out.push('};');
+  return out.join('\n');
+}
+
+/* ============ 事件绑定 ============ */
+const sel = $('preset');
+Object.keys(PRESETS).forEach(k => {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = k;
+  sel.appendChild(o);
+});
+sel.addEventListener('change', () => {
+  codeEl.value = PRESETS[sel.value];
+  hintEl.innerHTML = HINTS[sel.value] || '';
+  apply();
+});
+
+let timer = null;
+codeEl.addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(apply, 500);
+});
+codeEl.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = codeEl.selectionStart, en = codeEl.selectionEnd;
+    codeEl.value = codeEl.value.slice(0, s) + '  ' + codeEl.value.slice(en);
+    codeEl.selectionStart = codeEl.selectionEnd = s + 2;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    clearTimeout(timer);
+    apply();
+  }
+});
+
+$('apply').addEventListener('click', () => { clearTimeout(timer); apply(); });
+
+$('exportBtn').addEventListener('click', () => {
+  lutVisible = true;
+  $('lutPanel').style.display = '';
+  renderLUT();
+});
+
+$('exportAll').addEventListener('click', async () => {
+  try {
+    const text = exportAllSchemes();
+    $('lut').textContent = text;
+    $('lutPanel').style.display = '';
+    lutVisible = true;
+    try {
+      await navigator.clipboard.writeText(text);
+      setMsg('✓ 6 方案已导出并复制到剪贴板', 'ok');
+    } catch (clipErr) {
+      setMsg('✓ 已导出，请手动全选下方文本复制', 'ok');
+    }
+  } catch (e) {
+    setMsg('✗ 导出失败: ' + e.message, 'err');
+  }
+});
+
+$('copyBtn').addEventListener('click', async () => {
+  if (!lutVisible) {
+    lutVisible = true;
+    $('lutPanel').style.display = '';
+    renderLUT();
+  }
+  try {
+    await navigator.clipboard.writeText($('lut').textContent);
+    setMsg('✓ 已复制到剪贴板', 'ok');
+  } catch (e) {
+    setMsg('复制失败，请手动全选复制', 'err');
+  }
+});
+
+bandCv.addEventListener('mousemove', e => {
+  const rect = bandCv.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / rect.width * 256);
+  if (x < 0 || x > 255) return;
+  const r = lut[x * 3], g = lut[x * 3 + 1], b = lut[x * 3 + 2];
+  setMsg('gray=' + x + '  →  RGB(' + r + ', ' + g + ', ' + b + ')  #'
+         + hex2(r) + hex2(g) + hex2(b), 'ok');
+});
+bandCv.addEventListener('mouseleave', () => setMsg('', ''));
+
+$('file').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  const im = new Image();
+  im.onload = () => {
+    const MAX = 640;
+    const sc = Math.min(1, MAX / Math.max(im.width, im.height));
+    const w = Math.max(1, Math.round(im.width * sc));
+    const h = Math.max(1, Math.round(im.height * sc));
+    const tmp = document.createElement('canvas');
+    tmp.width = w; tmp.height = h;
+    const tc = tmp.getContext('2d');
+    tc.drawImage(im, 0, 0, w, h);
+    const d = tc.getImageData(0, 0, w, h).data;
+
+    testW = w; testH = h;
+    testGray = new Uint8ClampedArray(w * h);
+    for (let i = 0; i < w * h; i++) {
+      testGray[i] = (0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2] + 0.5) | 0;
+    }
+    URL.revokeObjectURL(url);
+    renderTest();
+    setMsg('✓ 已载入图片 ' + w + '×' + h, 'ok');
+  };
+  im.onerror = () => setMsg('图片加载失败', 'err');
+  im.src = url;
+});
+
+/* ============ 初始化 ============ */
+(function initTicks() {
+  const el = $('ticks');
+  for (let i = 0; i <= 8; i++) {
+    const s = document.createElement('span');
+    s.textContent = Math.round(i * 255 / 8);
+    el.appendChild(s);
+  }
+})();
+
+codeEl.value = PRESETS['Pseudo2 (四段)'];
+sel.value = 'Pseudo2 (四段)';
+hintEl.innerHTML = HINTS['Pseudo2 (四段)'];
+makeDefaultTest();
+apply();
+
+})();
+</script>
+</body>
+</html>

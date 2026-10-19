@@ -1,0 +1,48 @@
+名称/位号,值,封装,数量,价格,商品链接（仅供参考）,备注
+"C1,C4,C5,C6,C8,C11,C20,C21,C22,C24,C25",100nF,C0603,11,懒得填了,https://item.taobao.com/item.htm?id=537669338432&mi_id=0000KUF_IV1cB9pvqIRfbpOVPIKE7P7Y_4bLYBsri8nFAtE&spm=a1z10.3-c-s.w4002-24706531953.26.3b846a4bNWzc4Y,
+"C3,C13,C16,C17,C18,C19",1uF,C0603,6,,,
+"C2,C7,C23",10uF,C0603,3,,,
+"C9,C10,C15",22uF,C0603,3,,,
+C14,2.2uF,C0603,1,,,
+C12,47uF,CAP-SMD_BD5.0-L5.3-W5.3-LS5.9-FD,1,,https://item.taobao.com/item.htm?id=522573990106&mi_id=0000jOL4d-LHBOQ_oor8Mr37Absso3uJ5PpOeZT77hBZOSY&spm=a1z10.3-c-s.w4002-24706531953.12.41026a4bJGAwOp,
+D1,SS34,SMA_L4.3-W2.6-LS5.0-FD,1,,https://item.taobao.com/item.htm?id=589983956111&mi_id=0000qNVE9W0m1U3WOw0J-DAXDhcj4gvfeyYVpF-SFK_dZuI&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,
+D2,SD05.TCT,SOD-323_L1.7-W1.3-LS2.5-RD,1,,https://item.taobao.com/item.htm?id=653805722153&mi_id=00003Hn1ldIbPrY4299S9caFIQ58T43C4i004Da2IitztSw&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,
+D3,USBLC6-2SC6,SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL,1,,https://item.taobao.com/item.htm?id=653799154764&mi_id=0000Wcx_lfxGDlM4DdWhGSVH7fFM07j-bexw3GJoJVbKwKc&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,
+D4,PESD3V3L5UY,SOT-363_L2.0-W1.3-P0.65-LS2.1-BL,1,,https://item.taobao.com/item.htm?id=661055316387&mi_id=0000ftVorEOjtil0MXjRu1eM4zzgL23Ii10H-X05La3IARs&spm=tbpc.boughtlist.suborder_itempic.d661055316387.323d2e8dj7LDxE,
+"CN1,CN2",1.5-7P LT,CONN-SMD_7P-P1.50_HANBO_WAFER-150L-7A,2,,https://item.taobao.com/item.htm?id=565717809381&mi_id=0000osLRq_9WRRMpPlWWDBmLqTQ_4alt3Wi0AR_DVMT1D5A&spm=tbpc.boughtlist.suborder_itempic.d565717809381.323d2e8dj7LDxE,7P
+FPC1,FPC-05F-18PH20,FPC-SMD_18P-P0.50_FPC-05F-18PH20,1,,https://item.taobao.com/item.htm?id=552629356951&mi_id=0000WwSIZ-Sqz6lmLCZFTPFMrv6SGb88jRGtISPNXA9_3E4&spm=tbpc.boughtlist.suborder_itempic.d552629356951.323d2e8dj7LDxE,18P翻盖下接
+L1,10uH,IND-SMD_L4.6-W4.1,1,,https://item.taobao.com/item.htm?id=528437837997&mi_id=00003WoqmNLHdEE0_SeAcmLztNQ-kjkBoeUEKVfIV15dVj0&spm=tbpc.boughtlist.suborder_itempic.d528437837997.323d2e8dj7LDxE,
+LED1,XL-1608UGC-04,LED0603-RD_GREEN,1,,https://item.taobao.com/item.htm?id=526211410115&mi_id=0000m8H0B5LiKXBEbZvao1qf2UsnCeiaA--dJ5GDQ8-sdEM&spm=a1z10.3-c-s.w4002-24706531953.12.5a886a4bNoiWaf,
+LED2,XL-1608SURC-06,LED0603-RD_RED,1,,,
+"Q1,Q2,Q3,Q4",S8050,SOT-23-3_L2.9-W1.3-P1.90-LS2.3-BR,4,,https://item.taobao.com/item.htm?id=522577964105&mi_id=0000zmKZ8q2JP7lOgCR6tWtVMeXyjtTvCMG-gyV_MOZsj5c&spm=a1z10.3-c-s.w4002-24706531953.11.5d6b6a4btIXhBp,
+"R1,R2,R3,R4,R10,R11,R12,R13,R14,R16,R23,R24,R25,R26,R28",10K,R0603,15,,https://item.taobao.com/item.htm?id=522577284045&mi_id=0000WljJ3Pi2NoAuEhGDt-0R4rg8G2_D9Eb-O33pcZgk1vg&sku_properties=-1%3A-1%3B-2%3A-2&spm=a1z10.3-c-s.w4002-24706531953.16.56686a4bQtqqGE,
+R5,0.3,R0603,1,,,用0Ω或直接一坨锡糊上也问题不大
+"R6,R15,R17,R18,R19",1K,R0603,5,,,
+R7,1.1K,R0603,1,,,
+"R8,R9",5.1K,R0603,2,,,
+R20,100K,R0603,1,,,
+R21,33K,R0603,1,,,
+R22,4.3,R0603,1,,,
+R27,2K2,R0603,1,,,
+BUZZER1,4kHz,SMD1230,1,,https://detail.tmall.com/item.htm?id=43712978093&mi_id=00006RQYZ4UxFY8wXNgmwgPDh1qJADOi41dgjAn_1lQkqlY&spm=tbpc.boughtlist.suborder_itempic.d43712978093.323d2e8dj7LDxE,1230封装，3.3V
+"SW1,SW2",TS-1088-AR02016,SW-SMD_L3.9-W3.0-P4.45,2,,https://item.taobao.com/item.htm?id=546724645617&mi_id=00001CKrQ8SJDYuTeLwZcD6AdEWQZ21rHjQBbFGfRrFBWUQ&spm=tbpc.boughtlist.suborder_itempic.d546724645617.76302e8dpXXEkH,
+SW3,5.8 ZSGT,SW-TH_5.8ZSGT,1,,https://item.taobao.com/item.htm?id=557846202031&mi_id=0000BakKGC7bDs5TfqA8yoLifmC5Xtb2SUZkwDcYwl6CRzY&spm=tbpc.boughtlist.suborder_itempic.d557846202031.323d2e8dj7LDxE,5.8*5.8
+SW4,ZX-QC1212-5.5TP,KEY-SMD_4P-L12.0-W12.0-P5.00-LS15.0,1,,https://item.taobao.com/item.htm?id=556956143399&mi_id=0000ahpgoMHEDTKbqybQyT9-wj7-ze0bo26K0mW9FvrzpEk&skuId=5966633136545&spm=a1z10.3-c-s.w4002-24706531953.22.11f06a4bRworAF,12*12*6贴片
+"SW5,SW6,SW7",KH-6X6X9H-TJ,SW-TH_4P-L6.0-W6.0-P4.50-LS6.5,3,,https://item.taobao.com/item.htm?id=556956143399&mi_id=0000BIG7soPbdBjzlNsU_FYvGpiP--xdwmDuwK8Lfh-Q1m0&spm=tbpc.boughtlist.suborder_itempic.d556956143399.323d2e8dj7LDxE,6*6*10
+U1,2.4GHz,WIRELM-SMD_ESP32-S3-WROOM-1,1,,https://item.taobao.com/item.htm?id=701482545996&mi_id=0000dlOBAN7E5Qz61Hpt4LD8WdilIc9IvHB-N5ADgsVSkU4&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,
+U2,CH340K,ESOP-10_L4.9-W3.9-P1.00-LS6.2-BL-EP,1,,https://item.taobao.com/item.htm?id=684298719573&mi_id=0000-6ANNS620_NRHk9ZC5hMwhwQqTqTWA4RaT6UEDZGnW0&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,
+U3,TP5400,ESOP-8_L4.9-W3.9-P1.27-LS6.0-BL-EP,1,,https://item.taobao.com/item.htm?id=658991913184&mi_id=0000FjRBybpMMjoh3ttNphjZ2CHmxYcT5EYt3_WNSiBgjIQ&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,
+U4,SGM2205-3.3XKC3G/TR,SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR,1,,https://item.taobao.com/item.htm?id=676845377053&mi_id=0000-Q_rr_ANRAoiuXMVrG3gj7ACDYBMLwYBSujP4r7Xfgs&spm=tbpc.boughtlist.suborder_itempic.d676845377053.76302e8dpXXEkH,
+U5,MLX90640ESF-BAB-000-TU,TO-39-4_MLX90640ESF-BAB-000-TU,1,,https://item.taobao.com/item.htm?id=672821214850&mi_id=00007RLmhP-wLpHToi4S4gxyJbbxolEvei9gniGatvWjbCU&spm=tbpc.boughtlist.suborder_itempic.d672821214850.323d2e8dj7LDxE,可找二手，能便宜很多，注意别有坏点
+U6,TOF400C,HDR-TH_6P-P2.54-V-M,1,,https://item.taobao.com/item.htm?id=939124272740&mi_id=0000RZadGPoBGHavrQWr5nMwUiXlsx6CAA8aGITtiOyYmzk&spm=tbpc.boughtlist.suborder_itempic.d939124272740.323d2e8dj7LDxE,TOF400C，可选装
+U7,TF-01A,TF-SMD_TF-01A,1,,https://item.taobao.com/item.htm?id=720212395210&mi_id=0000xMF57H4yrU2gv0-A5LrYM6fwqK6kloGd3UU5xBj4_eo&skuId=5937608459601&spm=tbpc.boughtlist.suborder_itemtitle.1.323d2e8dj7LDxE,TF-外焊-自弹
+USB1,TYPE-C 16PIN 2MD(073),USB-C-SMD_TYPE-C-16PIN-2MD-073,1,,https://item.taobao.com/item.htm?id=737420996141&mi_id=0000BFdTB7qDrbvyfPKzYRTDvk3YkqZZ5m7M1axn-oCL7O4&skuId=5094723445245&spm=a1z10.3-c-s.w4002-24706531953.20.75826a4bl6bqYT,6.5mm的
+LASER1,6mm,激光管,1,,https://detail.tmall.com/item.htm?id=549418569663&mi_id=0000o-JZGPrcig0yRfxbfUIOvp1XZttWQWi26y1usVhBR1E&skuId=4005385081974&spm=tbpc.boughtlist.suborder_itempic.d549418569663.323d2e8dj7LDxE,3.3V点状6mm
+"SCREW1,SCREW2,SCREW3,SCREW4,SCREW5,SCREW6,SCREW7,SCREW8,SCREW9",,M2螺丝,9,,https://item.taobao.com/item.htm?id=555340649969&mi_id=0000Zf55vVvLrvSNp-qgyqOwreo0hDs6orP5QESdW3ga_9k&spm=a1z10.3-c-s.w4002-24706531953.13.13e76a4b0SXn5Y,M2*5 M2*6 M2*8均可
+SCREEN,320*240,IPS屏幕,1,,https://item.taobao.com/item.htm?id=748230294619&mi_id=0000aReF0vGN7AMHay5JH-gfJ1rscVMGhKKMFDgMdWD9_x8&spm=tbpc.boughtlist.suborder_itempic.d748230294619.323d2e8dj7LDxE,注意要ST7735驱动芯片不带触摸的，IPS和TFT二选一，IPS的好点，TFT的省两块钱，但是要改宏定义
+,,TFT屏幕,,,https://item.taobao.com/item.htm?id=748318527653&mi_id=0000YSzTlBfDoTWswka3BkkJVqkpix8RayJpZHBfiXPw7ng&spm=tbpc.boughtlist.suborder_itempic.d748318527653.323d2e8dj7LDxE,
+BAT,18650,18650电池,1,,https://detail.tmall.com/item.htm?id=807373747063&mi_id=0000PWSnNwnBo5ozM6un3sd27KR1WJnH1snF4LLb6gbexPw&spm=tbpc.boughtlist.suborder_itempic.d807373747063.323d2e8dj7LDxE,丰俭由人
+BAT CASE,1*18650,电池盒,1,,https://item.taobao.com/item.htm?id=554580202359&mi_id=0000OokNyeAWA5Tcm7mHuGncXq0V5x2aqDW_s_hnrkv2Jvw&skuId=4844020996363&spm=tbpc.boughtlist.suborder_itempic.d554580202359.323d2e8dj7LDxE,单节的
+WIRE,7P,ZH1.5,2,,https://item.taobao.com/item.htm?id=565553410961&mi_id=0000sUKHfC_4XPjH2ZkBjRrBv5ZUYpqFi2rV0hqN8uW6etg&skuId=4871996293946&spm=tbpc.boughtlist.suborder_itempic.d565553410961.323d2e8dj7LDxE,7P，10cm
+CARD,,Micro SD Card,1,,https://detail.tmall.com/item.htm?abbucket=5&id=648801516814&mi_id=000087Ck52uCW928-7dMQMmIeBSZ1bRVwPOZtz8hPvqnvtA&ns=1&skuId=4677056644749&spm=a21n57.1.hoverItem.2&utparam=%7B%22aplus_abtest%22%3A%225e79dea3fbd2d2c6b39fd8551540ff8e%22%7D&xxc=taobaoSearch,TF卡，即micro SD卡；容量丰俭由人，反正存那几张图也没多大
+CARD READER,,Card reader,1,,https://detail.tmall.com/item.htm?id=568593336701&mi_id=0000lc86lRJIlaM0GRtH1l5_7jXV0XGdfPfVmJpQTk00l8U&spm=tbpc.boughtlist.suborder_itempic.d568593336701.76302e8dpXXEkH,读卡器，没有就买一个
